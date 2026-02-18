@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GéoGalup - Cartes Postales Anciennes</title>
+
+    <!-- OpenLayers CSS - Utilisation d'une version stable connue -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: sans-serif;
+            background: #eee;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            height: 60px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #map {
+            width: 100%;
+            height: calc(100vh - 60px);
+            background-color: #ffffff;
+            border: 2px solid #ccc;
+        }
+
+        .popup {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            min-width: 250px;
+            max-width: 350px;
+        }
+
+        .popup img {
+            max-width: 100%;
+            margin: 10px 0;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .popup p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .popup .meta {
+            font-size: 0.8em;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1 style="margin:0;">GéoGalup</h1>
+        <a href="/admin/"
+            style="color: white; text-decoration: none; font-weight: bold; background: #34495e; padding: 5px 15px; border-radius: 4px;">Administration</a>
+    </header>
+
+    <div id="map"></div>
+    <div id="popup" class="popup" style="display: none;">
+        <div id="popup-content"></div>
+    </div>
+
+    <!-- OpenLayers JS - Version 6 pour compatibilité maximale avec les scripts classiques -->
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol.js"></script>
+
+    <script>
+        console.log("Initialisation du script GéoGalup...");
+
+        window.onload = function () {
+            if (typeof ol === 'undefined') {
+                console.error("ERREUR : OpenLayers (ol) n'est pas défini. Vérifiez le chargement du script CDN.");
+                document.body.innerHTML += '<div style="position:fixed; top:70px; left:20px; right:20px; background:red; color:white; padding:20px; z-index:9999;">Erreur : Impossible de charger la bibliothèque de carte (OpenLayers). Vérifiez votre connexion internet.</div>';
+                return;
+            }
+
+            console.log("OpenLayers chargé. Création de la carte...");
+
+            try {
+                // 1. Initialisation de la carte
+                const map = new ol.Map({
+                    target: 'map',
+                    layers: [
+                        new ol.layer.Tile({
+                            source: new ol.source.OSM()
+                        })
+                    ],
+                    view: new ol.View({
+                        center: ol.proj.fromLonLat([1.4442, 43.6047]),
+                        zoom: 6
+                    })
+                });
+                console.log("Carte OpenLayers créée avec succès.");
+
+                // 2. Source de données GeoJSON
+                const vectorSource = new ol.source.Vector({
+                    url: '/api/photos/',
+                    format: new ol.format.GeoJSON()
+                });
+
+                const vectorLayer = new ol.layer.Vector({
+                    source: vectorSource,
+                    style: function (feature) {
+                        const azimuth = feature.get('azimuth') || 0;
+                        // On Convertit en radians pour OpenLayers
+                        const rotation = (azimuth * Math.PI) / 180;
+
+                        return new ol.style.Style({
+                            image: new ol.style.Icon({
+                                anchor: [0.5, 0.5],
+                                // On utilise une flèche pour indiquer la direction
+                                src: 'https://cdn-icons-png.flaticon.com/512/10427/10427063.png',
+                                scale: 0.05,
+                                rotation: rotation
+                            })
+                        });
+                    }
+                });
+                map.addLayer(vectorLayer);
+
+                // Debug chargement
+                vectorSource.on('addfeature', function () {
+                    console.log("Photo ajoutée sur la carte !");
+                });
+                vectorSource.on('featuresloaderror', function () {
+                    console.error("Impossible de charger les données depuis /api/photos/.");
+                });
+
+                // 3. Gestion de l'overlay (Popup)
+                const popupElement = document.getElementById('popup');
+                const popupContent = document.getElementById('popup-content');
+                const overlay = new ol.Overlay({
+                    element: popupElement,
+                    positioning: 'bottom-center',
+                    stopEvent: false,
+                    offset: [0, -45]
+                });
+                map.addOverlay(overlay);
+
+                // 4. Interaction clic
+                map.on('click', function (evt) {
+                    const feature = map.forEachFeatureAtPixel(evt.pixel, function (f) { return f; });
+
+                    if (feature) {
+                        const props = feature.getProperties();
+                        const coordinates = feature.getGeometry().getCoordinates();
+
+                        console.log("Photo cliquée :", props.title);
+
+                        let content = `<h3>${props.title}</h3>`;
+
+                        if (props.image) {
+                            content += `<img src="${props.image}" alt="${props.title}">`;
+                        }
+
+                        content += `<p>${props.description || 'Pas de description.'}</p>`;
+
+                        if (props.year) {
+                            content += `<p><strong>Année :</strong> ${props.year} ${props.is_approximate ? '(approx.)' : ''}</p>`;
+                        }
+
+                        if (props.azimuth !== undefined) {
+                            content += `<p><strong>Azimut :</strong> ${props.azimuth}°</p>`;
+                        }
+
+                        if (props.source_name) {
+                            let sourceHtml = props.source_url
+                                ? `<a href="${props.source_url}" target="_blank">${props.source_name}</a>`
+                                : props.source_name;
+                            content += `<div class="meta">Source : ${sourceHtml}</div>`;
+                        }
+
+                        if (props.author_name) {
+                            content += `<div class="meta">Auteur : ${props.author_name}</div>`;
+                        }
+
+                        popupContent.innerHTML = content;
+                        overlay.setPosition(coordinates);
+                        popupElement.style.display = 'block';
+                    } else {
+                        popupElement.style.display = 'none';
+                    }
+                });
+
+                // 5. Curseur au survol
+                map.on('pointermove', function (e) {
+                    if (e.dragging) return;
+                    const pixel = map.getEventPixel(e.originalEvent);
+                    const hit = map.hasFeatureAtPixel(pixel);
+                    map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+                });
+
+            } catch (error) {
+                console.error("Erreur fatale lors de l'initialisation de la carte :", error);
+                document.body.innerHTML += `<div style="padding:20px; color:red;">Erreur JS : ${error.message}</div>`;
+            }
+        };
+    </script>
+
+</body>
+
+</html>
