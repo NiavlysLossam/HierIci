@@ -23,5 +23,5 @@ class PhotoSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Photo
         geo_field = 'location'
-        fields = ('id', 'title', 'image', 'description', 'year', 'is_approximate', 
+        fields = ('id', 'title', 'image', 'image_url', 'description', 'year', 'is_approximate', 
                   'author_name', 'source_name', 'source_url', 'azimuth')

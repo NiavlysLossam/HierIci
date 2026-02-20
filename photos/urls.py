@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PhotoViewSet, AuthorViewSet, SourceViewSet, home
+from .views import PhotoViewSet, AuthorViewSet, SourceViewSet, home, proxy_tarn_image
 
 router = DefaultRouter()
 router.register(r'photos', PhotoViewSet)
@@ -12,4 +12,5 @@ app_name = 'photos'
 urlpatterns = [
     path('', home, name='home'),
     path('api/', include(router.urls)),
+    path('proxy-tarn-image/', proxy_tarn_image, name='proxy_tarn_image'),
 ]

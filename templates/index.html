@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -253,6 +254,12 @@
             background-color: #fff !important;
         }
 
+        .ol-zoom {
+            top: auto !important;
+            bottom: 20px !important;
+            left: 20px !important;
+        }
+
         /* Responsive Mobile */
         @media (max-width: 600px) {
             :root {
@@ -267,6 +274,80 @@
                 width: 100%;
                 justify-content: space-between;
             }
+        }
+
+        /* Modal Styles */
+        #image-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #image-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content-wrapper {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #modal-img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            object-fit: contain;
+        }
+
+        .modal-caption {
+            color: white;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.1);
+        }
+
+        .photo-container img {
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-container img:hover {
+            transform: scale(1.02);
         }
     </style>
 </head>
@@ -296,6 +377,14 @@
         </aside>
     </div>
 
+    <div id="image-modal" onclick="closeModal(event)">
+        <div class="modal-content-wrapper" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modal-img" src="" alt="">
+            <div id="modal-caption" class="modal-caption"></div>
+        </div>
+    </div>
+
     <!-- OpenLayers JS -->
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol.js"></script>
 
@@ -304,6 +393,23 @@
 
         function closePanel() {
             document.getElementById('side-panel').classList.remove('open');
+        }
+
+        function openModal(imgSrc, title) {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalCaption = document.getElementById('modal-caption');
+
+            modalImg.src = imgSrc;
+            modalCaption.innerText = title;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeModal(event) {
+            const modal = document.getElementById('image-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
         }
 
         window.onload = function () {
@@ -330,18 +436,48 @@
                 format: new ol.format.GeoJSON()
             });
 
-            const arrowSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" fill="#1a2a3a" stroke="#FFFFFF" stroke-width="2"/></svg>`;
-            const iconSrc = "data:image/svg+xml;base64," + btoa(arrowSvg);
+            const clusterSource = new ol.source.Cluster({
+                distance: 40,
+                source: vectorSource
+            });
+
+            // Cache pour les styles d'icônes individuelles afin d'éviter la recréation
+            const styleCache = {};
 
             vectorLayer = new ol.layer.Vector({
-                source: vectorSource,
+                source: clusterSource,
                 style: function (feature) {
-                    const azimuth = feature.get('azimuth') || 0;
+                    const size = feature.get('features').length;
+                    if (size > 1) {
+                        return new ol.style.Style({
+                            image: new ol.style.Circle({
+                                radius: 18,
+                                border: new ol.style.Stroke({
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    width: 1
+                                }),
+                                fill: new ol.style.Fill({
+                                    color: 'rgba(26, 42, 58, 0.9)'
+                                })
+                            }),
+                            text: new ol.style.Text({
+                                text: size.toString(),
+                                fill: new ol.style.Fill({
+                                    color: '#fff'
+                                }),
+                                font: 'bold 12px Inter, sans-serif'
+                            })
+                        });
+                    }
+
+                    // Style pour un point unique
+                    const originalFeature = feature.get('features')[0];
+                    const azimuth = originalFeature.get('azimuth') || 0;
                     return new ol.style.Style({
                         image: new ol.style.Icon({
                             anchor: [0.5, 0.5],
-                            src: iconSrc,
-                            scale: 0.5,
+                            src: "{% static 'symboles/photo_marker.svg' %}",
+                            scale: 0.4,
                             rotation: (azimuth * Math.PI) / 180,
                             rotateWithView: true
                         })
@@ -354,7 +490,16 @@
             map.on('click', function (evt) {
                 const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
                 if (feature) {
-                    showPhotoDetails(feature.getProperties());
+                    const features = feature.get('features');
+                    if (features.length > 1) {
+                        // Zoom sur le cluster
+                        const extent = ol.extent.createEmpty();
+                        features.forEach(f => ol.extent.extend(extent, f.getGeometry().getExtent()));
+                        map.getView().fit(extent, { duration: 500, padding: [50, 50, 50, 50] });
+                    } else {
+                        // Afficher les détails du point unique
+                        showPhotoDetails(features[0].getProperties());
+                    }
                 } else {
                     closePanel();
                 }
@@ -375,9 +520,16 @@
 
             panel.classList.add('open');
 
-            // Photo
-            photoEl.innerHTML = props.image
-                ? `<img src="${props.image}" alt="${props.title}">`
+            // Photo logic (Hybrid: remote URL or local image)
+            let displayImageUrl = props.image_url || props.image;
+
+            // Si l'image provient des archives du Tarn, on passe par notre proxy local
+            if (props.image_url && props.image_url.includes('recherche-archives.tarn.fr')) {
+                displayImageUrl = `/proxy-tarn-image/?url=${encodeURIComponent(props.image_url)}`;
+            }
+
+            photoEl.innerHTML = displayImageUrl
+                ? `<img src="${displayImageUrl}" alt="${props.title}" onclick="openModal('${displayImageUrl}', '${props.title.replace(/'/g, "\\'")}')">`
                 : `<div style="color:white">Aucune image disponible</div>`;
 
             // Metadata badges

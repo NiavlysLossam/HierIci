@@ -23,7 +23,8 @@ class Source(models.Model):
 
 class Photo(models.Model):
     title = models.CharField(max_length=200, verbose_name="Titre")
-    image = models.ImageField(upload_to='', verbose_name="Image")
+    image = models.ImageField(upload_to='', verbose_name="Image locale", blank=True, null=True)
+    image_url = models.URLField(max_length=1000, blank=True, null=True, verbose_name="URL de l'image (ex: IIIF)")
     description = models.TextField(blank=True, verbose_name="Description")
     
     # Modifications demandées pour la date
