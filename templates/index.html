@@ -554,7 +554,9 @@
 
         <!-- Layer Switcher -->
         <div id="layer-switcher">
-            <button class="layer-btn active" data-layer="voyager" onclick="switchBaseLayer('voyager')">Carte</button>
+            <button class="layer-btn active" data-layer="darkMatter"
+                onclick="switchBaseLayer('darkMatter')">Sombre</button>
+            <button class="layer-btn" data-layer="voyager" onclick="switchBaseLayer('voyager')">Clair</button>
             <button class="layer-btn" data-layer="ortho1950" onclick="switchBaseLayer('ortho1950')">Ortho
                 1950–1965</button>
             <button class="layer-btn" data-layer="ortho1965" onclick="switchBaseLayer('ortho1965')">Ortho
@@ -657,12 +659,19 @@
 
         // Définition des fonds de plan
         const baseLayers = {
+            darkMatter: new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    url: 'https://{a-c}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                    attributions: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                }),
+                visible: true
+            }),
             voyager: new ol.layer.Tile({
                 source: new ol.source.XYZ({
                     url: 'https://{a-c}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                     attributions: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                 }),
-                visible: true
+                visible: false
             }),
             ortho1950: new ol.layer.Tile({
                 source: new ol.source.WMTS({
@@ -706,6 +715,7 @@
             map = new ol.Map({
                 target: 'map',
                 layers: [
+                    baseLayers.darkMatter,
                     baseLayers.voyager,
                     baseLayers.ortho1950,
                     baseLayers.ortho1965
