@@ -238,7 +238,7 @@ function showPhotoDetails(props) {
     }
 
     photoEl.innerHTML = displayImageUrl
-        ? `<img src="${displayImageUrl}" alt="${props.title}" onclick="openModal('${displayImageUrl}', '${props.title.replace(/'/g, "\\'")}')">` 
+        ? `<img src="${displayImageUrl}" alt="${props.title}" onclick="openModal('${displayImageUrl}', '${props.title.replace(/'/g, "\\'")}')">`
         : `<div style="color:white">Aucune image disponible</div>`;
 
     // Metadata badges
