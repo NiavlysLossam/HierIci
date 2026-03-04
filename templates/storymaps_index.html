@@ -1,0 +1,313 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storymaps — HierIci</title>
+    <meta name="description" content="Explorez les storymaps HierIci : des récits cartographiés à travers le temps.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---- Reset & Base ---- */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0f1923;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* ---- En-tête ---- */
+        header {
+            padding: 48px 64px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-back {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .logo-back:hover {
+            color: #fff;
+        }
+
+        .logo-back svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            padding: 64px 64px 40px;
+        }
+
+        .hero h1 {
+            margin: 0 0 16px;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, rgba(212, 175, 55, 0.9));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            margin: 0;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.55);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* ---- Grille de cartes ---- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            padding: 0 64px 80px;
+        }
+
+        /* ---- Carte storymap ---- */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        /* Thumbnail */
+        .card-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+            background: #1a2a3a;
+        }
+
+        /* Placeholder si pas de thumbnail */
+        .card-thumb-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a2a3a 0%, #0f1923 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-thumb-placeholder svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.2;
+        }
+
+        /* Corps de la carte */
+        .card-body {
+            padding: 24px 28px 28px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-chapters {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #d4af37;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.3px;
+        }
+
+        .card-desc {
+            margin: 0;
+            font-size: 0.87rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-cta {
+            margin-top: auto;
+            padding-top: 16px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .card:hover .card-cta {
+            color: #d4af37;
+        }
+
+        .card-cta svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ---- État vide ---- */
+        .empty {
+            text-align: center;
+            padding: 80px 64px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty p {
+            font-size: 1rem;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 640px) {
+
+            header,
+            .hero,
+            .grid {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="/" class="logo-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Retour à la carte
+        </a>
+    </header>
+
+    <section class="hero">
+        <h1>Storymaps</h1>
+        <p>Explorez le territoire à travers des récits géographiques enrichis de photographies anciennes.</p>
+    </section>
+
+    <div class="grid" id="storymaps-grid">
+        <!-- rempli dynamiquement par JS -->
+    </div>
+
+    <script>
+        (async function () {
+            const grid = document.getElementById('storymaps-grid');
+
+            try {
+                const res = await fetch('/api/storymaps/');
+                if (!res.ok) throw new Error('Erreur réseau');
+                const storymaps = await res.json();
+
+                if (!storymaps.length) {
+                    grid.innerHTML = `
+                    <div class="empty" style="grid-column:1/-1">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                        </svg>
+                        <p>Aucune storymap publiée pour l'instant.</p>
+                    </div>`;
+                    return;
+                }
+
+                storymaps.forEach(sm => {
+                    const thumb = sm.thumbnail_url
+                        ? `<img class="card-thumb" src="${sm.thumbnail_url}" alt="${sm.title}" loading="lazy">`
+                        : `<div class="card-thumb-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.2">
+                                <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                            </svg>
+                       </div>`;
+
+                    const chapLabel = sm.chapter_count > 1
+                        ? `${sm.chapter_count} chapitres`
+                        : sm.chapter_count === 1 ? '1 chapitre' : '';
+
+                    const card = document.createElement('a');
+                    card.href = `/storymap/${sm.slug}/`;
+                    card.className = 'card';
+                    card.innerHTML = `
+                    ${thumb}
+                    <div class="card-body">
+                        ${chapLabel ? `<div class="card-chapters">${chapLabel}</div>` : ''}
+                        <h2 class="card-title">${sm.title}</h2>
+                        ${sm.description ? `<p class="card-desc">${sm.description}</p>` : ''}
+                        <div class="card-cta">
+                            Explorer
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </div>
+                    </div>`;
+                    grid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><p>Impossible de charger les storymaps.</p></div>`;
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storymap — HierIci</title>
+
+    <!-- Typography: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- OpenLayers CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
+
+    <link rel="stylesheet" href="{% static 'css/storymap.css' %}">
+</head>
+
+<body>
+
+    <!-- Panneau narratif (gauche, scrollable) -->
+    <div id="story-scroll">
+
+        <!-- Chapitre d'introduction (généré par JS) -->
+        <div id="story-intro" class="chapter chapter-intro">
+            <div class="intro-content">
+                <a href="/" class="back-link">← Retour à la carte</a>
+                <h1 id="story-title">Chargement…</h1>
+                <p id="story-description"></p>
+            </div>
+        </div>
+
+        <!-- Chapitres (générés dynamiquement par JS) -->
+        <div id="story-chapters"></div>
+
+        <!-- Fin de storymap -->
+        <div class="chapter chapter-end">
+            <div class="end-content">
+                <p>Fin de la storymap</p>
+                <a href="/" class="btn-back">Explorer la carte complète →</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Carte fixe (droite) -->
+    <div id="map-sticky">
+        <div id="map"></div>
+        <!-- Indicateur de chapitre actif -->
+        <div id="chapter-indicator"></div>
+    </div>
+
+    <!-- OpenLayers JS -->
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol.js"></script>
+
+    <!-- Données Django → JS -->
+    <script>
+        window.STORYMAP_SLUG = "{{ slug }}";
+        window.STORYMAP_API_URL = "/api/storymaps/{{ slug }}/";
+        window.PHOTO_MARKER_URL = "{% static 'symboles/photo_marker.svg' %}";
+    </script>
+
+    <script src="{% static 'js/storymap.js' %}"></script>
+
+</body>
+
+</html>
