@@ -24,7 +24,7 @@ echo "🚀 Début du déploiement de $PROJECT_NAME..."
 
 echo "📦 1. Mise à jour du système et installation des dépendances système..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib apache2 git curl build-essential certbot python3-certbot-apache
+sudo apt install -y python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib apache2 git curl build-essential certbot python3-certbot-apache gdal-bin libgdal-dev python3-gdal binutils libproj-dev postgis
 
 echo "🗄️ 2. Configuration de PostgreSQL..."
 # On utilise EOF pour exécuter plusieurs requêtes SQL d'un coup en tant qu'utilisateur postgres
@@ -38,6 +38,10 @@ GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
 ALTER DATABASE $DB_NAME OWNER TO $DB_USER;
 \q
 EOF
+
+# Activation de l'extension PostGIS sur la base de données
+sudo -u postgres psql -d $DB_NAME -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+sudo -u postgres psql -d $DB_NAME -c "CREATE EXTENSION IF NOT EXISTS postgis_topology;"
 
 echo "📁 3. Préparation du répertoire du projet..."
 sudo mkdir -p $PROJECT_DIR
@@ -68,8 +72,8 @@ SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_sec
 DEBUG=False
 ALLOWED_HOSTS=$DOMAIN,127.0.0.1,localhost
 
-# Base de données (utilisée par django-environ)
-DATABASE_URL=postgres://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME
+# Base de données (utilisée par django-environ avec GeoDjango)
+DATABASE_URL=postgis://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME
 EOF
 
     echo "Fichier .env généré avec succès. N'oubliez pas d'adapter votre settings.py pour utiliser python-dotenv ou os.environ afin de lire ces variables."
