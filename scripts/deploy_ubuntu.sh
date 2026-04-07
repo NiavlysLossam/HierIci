@@ -17,7 +17,7 @@ ADMIN_EMAIL="admin@votre-domaine.com"                          # <-- À REMPLACE
 
 DB_NAME="hiericidb"
 DB_USER="hiericiuser"
-DB_PASS="MotDePasseTresSecurise123"                            # <-- À REMPLACER
+DB_PASS="MotDePasseTresSecurise123!"                            # <-- À REMPLACER
 # =================================================
 
 echo "🚀 Début du déploiement de $PROJECT_NAME..."
