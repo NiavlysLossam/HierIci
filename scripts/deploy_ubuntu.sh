@@ -88,6 +88,9 @@ else
     # Force la mise à jour de postgres:// vers postgis:// si le script a été lancé une première fois avant la modif
     sed -i 's|DATABASE_URL=postgres://|DATABASE_URL=postgis://|g' "$PROJECT_DIR/.env"
     
+    # Met systématiquement à jour les ALLOWED_HOSTS en fonction du domaine (très utile pour l'IP)
+    sed -i -E "s/^ALLOWED_HOSTS=.*/ALLOWED_HOSTS=$DOMAIN,127.0.0.1,localhost/g" "$PROJECT_DIR/.env"
+    
     # Ajoute le fix path pour GDAL si manquant
     if ! grep -q "GDAL_LIBRARY_PATH" "$PROJECT_DIR/.env" 2>/dev/null; then
         GDAL_PATH=$(find /usr/lib /usr/lib/x86_64-linux-gnu -name "libgdal.so*" -print -quit 2>/dev/null)
