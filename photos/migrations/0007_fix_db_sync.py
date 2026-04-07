@@ -33,19 +33,27 @@ class Migration(migrations.Migration):
         # 3. Renommer la colonne site_source_id -> source_id dans photos_photo
         migrations.RunSQL(
             sql="""
-                ALTER TABLE photos_photo
-                RENAME COLUMN site_source_id TO source_id;
+                DO $$
+                BEGIN
+                    IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='photos_photo' and column_name='site_source_id') THEN
+                        ALTER TABLE photos_photo RENAME COLUMN site_source_id TO source_id;
+                    END IF;
+                END $$;
             """,
-            reverse_sql="""
-                ALTER TABLE photos_photo
-                RENAME COLUMN source_id TO site_source_id;
-            """,
+            reverse_sql=migrations.RunSQL.noop,
         ),
 
         # 4. Renommer la table photos_sitesource -> photos_source
         migrations.RunSQL(
-            sql="ALTER TABLE photos_sitesource RENAME TO photos_source;",
-            reverse_sql="ALTER TABLE photos_source RENAME TO photos_sitesource;",
+            sql="""
+                DO $$
+                BEGIN
+                    IF EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='photos_sitesource') THEN
+                        ALTER TABLE photos_sitesource RENAME TO photos_source;
+                    END IF;
+                END $$;
+            """,
+            reverse_sql=migrations.RunSQL.noop,
         ),
 
         # 5. Renommer la PK de photos_source (optionnel mais propre)
@@ -60,15 +68,17 @@ class Migration(migrations.Migration):
         # 6. Recréer la FK photos_photo.source_id -> photos_source
         migrations.RunSQL(
             sql="""
-                ALTER TABLE photos_photo
-                ADD CONSTRAINT photos_photo_source_id_fk_photos_source_id
-                FOREIGN KEY (source_id) REFERENCES photos_source(id)
-                DEFERRABLE INITIALLY DEFERRED;
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name='photos_photo_source_id_fk_photos_source_id') THEN
+                        ALTER TABLE photos_photo
+                        ADD CONSTRAINT photos_photo_source_id_fk_photos_source_id
+                        FOREIGN KEY (source_id) REFERENCES photos_source(id)
+                        DEFERRABLE INITIALLY DEFERRED;
+                    END IF;
+                END $$;
             """,
-            reverse_sql="""
-                ALTER TABLE photos_photo
-                DROP CONSTRAINT IF EXISTS photos_photo_source_id_fk_photos_source_id;
-            """,
+            reverse_sql=migrations.RunSQL.noop,
         ),
 
         # 7. Supprimer les index liés à site_source_id et document_type_id

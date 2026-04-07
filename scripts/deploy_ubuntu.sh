@@ -67,6 +67,9 @@ pip install gunicorn psycopg2-binary
 
 echo "⚙️ 5. Création du fichier d'environnement (.env)..."
 if [ ! -f "$PROJECT_DIR/.env" ]; then
+    # On recherche l'emplacement exact de libgdal.so pour forcer Django à le trouver
+    GDAL_PATH=$(find /usr/lib /usr/lib/x86_64-linux-gnu -name "libgdal.so*" -print -quit 2>/dev/null)
+
     cat <<EOF > $PROJECT_DIR/.env
 SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
 DEBUG=False
@@ -74,9 +77,25 @@ ALLOWED_HOSTS=$DOMAIN,127.0.0.1,localhost
 
 # Base de données (utilisée par django-environ avec GeoDjango)
 DATABASE_URL=postgis://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME
+
+# Configuration spatiale (permet d'éviter "Could not find the GDAL library")
+GDAL_LIBRARY_PATH=$GDAL_PATH
 EOF
 
     echo "Fichier .env généré avec succès. N'oubliez pas d'adapter votre settings.py pour utiliser python-dotenv ou os.environ afin de lire ces variables."
+else
+    echo "Fichier .env existant détecté. Application du correctif GeoDjango..."
+    # Force la mise à jour de postgres:// vers postgis:// si le script a été lancé une première fois avant la modif
+    sed -i 's|DATABASE_URL=postgres://|DATABASE_URL=postgis://|g' "$PROJECT_DIR/.env"
+    
+    # Ajoute le fix path pour GDAL si manquant
+    if ! grep -q "GDAL_LIBRARY_PATH" "$PROJECT_DIR/.env" 2>/dev/null; then
+        GDAL_PATH=$(find /usr/lib /usr/lib/x86_64-linux-gnu -name "libgdal.so*" -print -quit 2>/dev/null)
+        echo "" >> "$PROJECT_DIR/.env"
+        echo "# Configuration spatiale (permet d'éviter Could not find the GDAL library)" >> "$PROJECT_DIR/.env"
+        echo "GDAL_LIBRARY_PATH=$GDAL_PATH" >> "$PROJECT_DIR/.env"
+        echo "Correctif GDAL appliqué au fichier .env !"
+    fi
 fi
 
 echo "🗃️ 6. Application des migrations et collecte des fichiers statiques..."
