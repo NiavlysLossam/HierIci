@@ -11,7 +11,7 @@ set -e
 # ================= Configuration =================
 PROJECT_NAME="HierIci"
 PROJECT_DIR="/var/www/hierici"
-GITHUB_REPO="https://github.com/VOTRE_UTILISATEUR/HierIci.git" # <-- À REMPLACER
+GITHUB_REPO="https://github.com/NiavlysLossam/HierIci.git" # <-- À REMPLACER
 DOMAIN="votre-domaine.com"                                     # <-- À REMPLACER
 ADMIN_EMAIL="admin@votre-domaine.com"                          # <-- À REMPLACER (pour le certificat SSL HTTPS)
 
@@ -24,7 +24,7 @@ echo "🚀 Début du déploiement de $PROJECT_NAME..."
 
 echo "📦 1. Mise à jour du système et installation des dépendances système..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib apache2 git curl libapache2-mod-proxy-html build-essential certbot python3-certbot-apache
+sudo apt install -y python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib apache2 git curl build-essential certbot python3-certbot-apache
 
 echo "🗄️ 2. Configuration de PostgreSQL..."
 # On utilise EOF pour exécuter plusieurs requêtes SQL d'un coup en tant qu'utilisateur postgres
@@ -68,13 +68,8 @@ SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_sec
 DEBUG=False
 ALLOWED_HOSTS=$DOMAIN,127.0.0.1,localhost
 
-# Base de données
-DB_ENGINE=django.db.backends.postgresql
-DB_NAME=$DB_NAME
-DB_USER=$DB_USER
-DB_PASSWORD=$DB_PASS
-DB_HOST=localhost
-DB_PORT=5432
+# Base de données (utilisée par django-environ)
+DATABASE_URL=postgres://$DB_USER:$DB_PASS@localhost:5432/$DB_NAME
 EOF
 
     echo "Fichier .env généré avec succès. N'oubliez pas d'adapter votre settings.py pour utiliser python-dotenv ou os.environ afin de lire ces variables."
