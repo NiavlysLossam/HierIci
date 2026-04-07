@@ -1,56 +1,95 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr">
+<html class="light" lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storymap — HierIci</title>
 
-    <!-- Typography: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    
     <!-- OpenLayers CSS -->
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
+    
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/storymap.css' %}?v=2">
 
-    <link rel="stylesheet" href="{% static 'css/storymap.css' %}">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline-variant": "#b0b1bc",
+                        "surface-bright": "#faf8fe",
+                        "on-tertiary": "#fff6ff",
+                        "surface-tint": "#235abf",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-surface-variant": "#5d5f68",
+                        "primary-fixed-dim": "#5988f0",
+                        "surface-container": "#ededf6",
+                        surface: "#faf8fe",
+                        /* Redefining primary specifically */
+                        primary: "#235abf",
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans", "sans-serif"],
+                        body: ["Public Sans", "sans-serif"],
+                        label: ["Public Sans", "sans-serif"],
+                        display: ["Public Sans", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
 </head>
 
-<body>
+<body class="flex flex-col md:flex-row h-screen w-screen overflow-hidden bg-surface font-body text-slate-800 antialiased">
 
-    <!-- Panneau narratif (gauche, scrollable) -->
-    <div id="story-scroll">
-
-        <!-- Chapitre d'introduction (généré par JS) -->
-        <div id="story-intro" class="chapter chapter-intro">
-            <div class="intro-content">
-                <a href="/" class="back-link">← Retour à la carte</a>
-                <h1 id="story-title">Chargement…</h1>
-                <p id="story-description"></p>
-            </div>
-        </div>
-
-        <!-- Chapitres (générés dynamiquement par JS) -->
-        <div id="story-chapters"></div>
-
-        <!-- Fin de storymap -->
-        <div class="chapter chapter-end">
-            <div class="end-content">
-                <p>Fin de la storymap</p>
-                <a href="/" class="btn-back">Explorer la carte complète →</a>
-            </div>
-        </div>
-
+    <!-- Carte (en haut sur mobile, droite sur desktop) -->
+    <div id="map-sticky" class="w-full h-[45vh] md:h-full md:flex-1 relative order-1 md:order-2 z-0 bg-slate-200">
+        <div id="map" class="w-full h-full"></div>
+        <!-- Indicateur de chapitre actif -->
+        <div id="chapter-indicator" class="absolute top-6 left-1/2 -translate-x-1/2 glass-panel !bg-black/60 !text-white !border-white/10 px-5 py-2 rounded-full text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase opacity-0 pointer-events-none transition-opacity duration-300 shadow-xl whitespace-nowrap overflow-hidden text-ellipsis max-w-[90%] text-center"></div>
     </div>
 
-    <!-- Carte fixe (droite) -->
-    <div id="map-sticky">
-        <div id="map"></div>
-        <!-- Indicateur de chapitre actif -->
-        <div id="chapter-indicator"></div>
+    <!-- Panneau narratif (scrollable, en bas sur mobile, gauche sur desktop) -->
+    <div id="story-scroll" class="w-full md:w-[45%] lg:w-[40%] h-[55vh] md:h-full overflow-y-auto overflow-x-hidden relative order-2 md:order-1 z-10 shadow-[20px_0_40px_rgba(0,0,0,0.1)] border-r border-outline-variant/10 custom-scrollbar scroll-smooth bg-surface">
+
+        <!-- Chapitre d'introduction -->
+        <div id="story-intro" class="chapter chapter-intro min-h-[60vh] md:min-h-screen flex flex-col justify-center px-8 md:px-14 py-20 archival-gradient text-white relative">
+            <div class="intro-content relative z-10">
+                <a href="/storymaps/" class="inline-flex items-center gap-2 text-white/50 hover:text-white text-xs font-bold tracking-widest uppercase mb-10 transition-colors">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span> Retour
+                </a>
+                <h1 id="story-title" class="text-4xl md:text-5xl lg:text-6xl font-headline font-bold leading-[1.1] mb-6 drop-shadow-sm">Chargement…</h1>
+                <p id="story-description" class="text-base md:text-lg text-white/80 leading-relaxed max-w-lg font-light"></p>
+            </div>
+            
+            <div class="absolute bottom-8 left-8 md:left-14 animate-pulse flex flex-col items-start gap-2 text-white/40">
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Défiler</span>
+                <span class="material-symbols-outlined">arrow_downward</span>
+            </div>
+        </div>
+
+        <!-- Espace pour les chapitres générés par JS -->
+        <div id="story-chapters" class="flex flex-col bg-surface-container-low/50"></div>
+
+        <!-- Fin de storymap -->
+        <div class="chapter chapter-end min-h-[40vh] md:min-h-[50vh] flex flex-col items-center justify-center p-12 archival-gradient text-white text-center">
+            <div class="end-content flex flex-col items-center">
+                <div class="w-12 h-px bg-white/20 mb-8"></div>
+                <span class="material-symbols-outlined text-4xl text-white/60 mb-4">auto_stories</span>
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 mb-8">Fin du récit</p>
+                <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary rounded-xl text-sm font-bold shadow-lg shadow-black/10 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 hover:bg-surface-container-low transition-all duration-300">
+                    Explorer la carte <span class="material-symbols-outlined text-sm">map</span>
+                </a>
+            </div>
+        </div>
+
     </div>
 
     <!-- OpenLayers JS -->
@@ -63,8 +102,7 @@
         window.PHOTO_MARKER_URL = "{% static 'symboles/photo_marker.svg' %}";
     </script>
 
-    <script src="{% static 'js/storymap.js' %}"></script>
+    <script src="{% static 'js/storymap.js' %}?v=2"></script>
 
 </body>
-
 </html>

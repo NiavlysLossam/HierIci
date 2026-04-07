@@ -7,40 +7,60 @@
 let map, vectorSource, vectorLayer;
 
 function closePanel() {
-    document.getElementById('side-panel').classList.remove('open');
+    const p = document.getElementById('photo-side-panel');
+    p.classList.add('translate-x-full');
+    p.classList.remove('translate-x-0');
 }
 
 function openAbout() {
     const m = document.getElementById('about-modal');
-    m.style.display = 'flex';
-    // Force reflow pour déclencher la transition
-    requestAnimationFrame(() => m.classList.add('active'));
+    m.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        m.classList.remove('opacity-0');
+        m.classList.add('opacity-100');
+    });
 }
 
 function closeAbout(event) {
     const m = document.getElementById('about-modal');
-    m.classList.remove('active');
-    setTimeout(() => { m.style.display = 'none'; }, 300);
+    m.classList.remove('opacity-100');
+    m.classList.add('opacity-0');
+    setTimeout(() => { m.classList.add('hidden'); }, 300);
 }
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeAbout();
+    if (e.key === 'Escape') {
+        closeAbout();
+        closeModal();
+    }
 });
 
-function openModal(imgSrc, title) {
+function openImageModal(imgSrc, title) {
+    if (!imgSrc || typeof imgSrc === 'object') {
+        imgSrc = document.getElementById('panel-photo').src;
+        title = document.getElementById('panel-photo').alt;
+    }
     const modal = document.getElementById('image-modal');
     const modalImg = document.getElementById('modal-img');
     const modalCaption = document.getElementById('modal-caption');
 
     modalImg.src = imgSrc;
     modalCaption.innerText = title;
-    modal.classList.add('active');
+    
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+    });
     document.body.style.overflow = 'hidden'; // Prevent scrolling
 }
+window.openModal = openImageModal;
 
 function closeModal(event) {
     const modal = document.getElementById('image-modal');
-    modal.classList.remove('active');
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    setTimeout(() => { modal.classList.add('hidden'); }, 300);
     document.body.style.overflow = ''; // Restore scrolling
 }
 
@@ -122,7 +142,14 @@ function switchBaseLayer(key) {
         baseLayers[k].setVisible(k === key);
     });
     document.querySelectorAll('.layer-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.layer === key);
+        const isActive = btn.dataset.layer === key;
+        if (isActive) {
+            btn.classList.add('bg-primary', 'text-white');
+            btn.classList.remove('bg-primary/5', 'text-primary', 'hover:bg-primary/10');
+        } else {
+            btn.classList.remove('bg-primary', 'text-white');
+            btn.classList.add('bg-primary/5', 'text-primary', 'hover:bg-primary/10');
+        }
     });
 }
 
@@ -223,55 +250,75 @@ window.onload = function () {
 };
 
 function showPhotoDetails(props) {
-    const panel = document.getElementById('side-panel');
-    const photoEl = document.getElementById('panel-photo');
-    const bodyEl = document.getElementById('panel-body');
+    const panel = document.getElementById('photo-side-panel');
+    panel.classList.remove('translate-x-full');
+    panel.classList.add('translate-x-0');
 
-    panel.classList.add('open');
-
-    // Photo logic (Hybrid: remote URL or local image)
+    // Photo logic 
     let displayImageUrl = props.image_url || props.image;
-
-    // Si l'image provient des archives du Tarn, on passe par notre proxy local
     if (props.image_url && props.image_url.includes('recherche-archives.tarn.fr')) {
         displayImageUrl = `/proxy-tarn-image/?url=${encodeURIComponent(props.image_url)}`;
     }
 
-    photoEl.innerHTML = displayImageUrl
-        ? `<img src="${displayImageUrl}" alt="${props.title}" onclick="openModal('${displayImageUrl}', '${props.title.replace(/'/g, "\\'")}')">`
-        : `<div style="color:white">Aucune image disponible</div>`;
-
-    // Metadata badges
-    let badges = '';
-    if (props.year) badges += `<span class="badge">${props.year} ${props.is_approximate ? 'approx.' : ''}</span>`;
-    if (props.azimuth !== undefined) badges += `<span class="badge">${props.azimuth}°</span>`;
-
-    // Footer
-    let footer = '';
-    if (props.source_name) {
-        const source = props.source_url
-            ? `<a href="${props.source_url}" target="_blank">${props.source_name}</a>`
-            : props.source_name;
-        footer += `<div><strong>Source :</strong> ${source}</div>`;
+    const photoEl = document.getElementById('panel-photo');
+    if (displayImageUrl) {
+        photoEl.src = displayImageUrl;
+        photoEl.alt = props.title;
+    } else {
+        photoEl.src = ''; 
+        photoEl.alt = 'Aucune image disponible';
     }
-    if (props.author_name) footer += `<div><strong>Auteur :</strong> ${props.author_name}</div>`;
 
-    bodyEl.innerHTML = `
-        <h2>${props.title}</h2>
-        <div class="metadata">${badges}</div>
-        <p class="description">${props.description || "Exploration d'une photographie ancienne géolocalisée."}</p>
-        
-        <div class="compass-indicator">
-            <svg class="compass-icon" style="transform: rotate(${props.azimuth || 0}deg)" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L15 8H9L12 2Z" fill="#1a2a3a"/>
-                <circle cx="12" cy="12" r="8" stroke="#1a2a3a" stroke-width="2"/>
-                <path d="M12 22V16" stroke="#1a2a3a" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span>Orientation : ${props.azimuth || 0}°</span>
-        </div>
+    // Modal onClick inside HTML container is already bound to openImageModal()
 
-        <div class="footer-info">
-            ${footer}
-        </div>
-    `;
+    // Badges / Archive ID
+    const archiveIdEl = document.getElementById('panel-archive-id');
+    if (props.archive_id || props.year) {
+        archiveIdEl.textContent = props.archive_id ? `Archive # ${props.archive_id}` : `Date: ${props.year}`;
+        archiveIdEl.classList.remove('hidden');
+    } else {
+        archiveIdEl.classList.add('hidden');
+    }
+
+    const eraEl = document.getElementById('panel-era');
+    if (props.era || props.year) {
+        eraEl.textContent = props.era || `${props.year} ${props.is_approximate ? 'approx.' : ''}`;
+        eraEl.classList.remove('hidden');
+    } else {
+        eraEl.classList.add('hidden');
+    }
+
+    document.getElementById('panel-title').textContent = props.title || "Sans Titre";
+    
+    // Details
+    const dateEl = document.getElementById('panel-date');
+    if (props.date_exacte || props.year) {
+         dateEl.querySelector('.val').textContent = props.date_exacte || props.year;
+         dateEl.classList.remove('hidden');
+    } else {
+         dateEl.classList.add('hidden');
+    }
+
+    const compassEl = document.getElementById('panel-compass');
+    if (props.azimuth !== undefined && props.azimuth !== null) {
+         compassEl.querySelector('.val').textContent = `${props.azimuth}°`;
+         document.getElementById('panel-compass-icon').style.transform = `rotate(${props.azimuth}deg)`;
+         compassEl.classList.remove('hidden');
+    } else {
+         compassEl.classList.add('hidden');
+    }
+
+    const descEl = document.getElementById('panel-desc');
+    descEl.textContent = props.description || "Exploration d'une photographie ancienne géolocalisée.";
+
+    const authorEl = document.getElementById('panel-author');
+    authorEl.textContent = props.author_name || "Photographe inconnu";
+
+    const sourceCont = document.getElementById('panel-source-container');
+    const sourceName = props.source_name || "Archives locales";
+    if (props.source_url) {
+        sourceCont.innerHTML = `<p class="text-sm font-bold text-primary"><a href="${props.source_url}" target="_blank" class="hover:underline">${sourceName}</a></p><p class="text-[11px] text-slate-500">Source Externe</p>`;
+    } else {
+        sourceCont.innerHTML = `<p class="text-sm font-bold text-primary">${sourceName}</p><p class="text-[11px] text-slate-500">Domaine présumé</p>`;
+    }
 }

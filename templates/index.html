@@ -1,94 +1,232 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr">
+<html class="light" lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>HierIci - Exploration Historique</title>
-
-    <!-- Typography: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    
     <!-- OpenLayers CSS -->
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
-
-    <!-- Styles de l'application -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/css/ol.css" type="text/css">
+    
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}?v=2">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline-variant": "#b0b1bc",
+                        "surface-bright": "#faf8fe",
+                        "on-tertiary": "#fff6ff",
+                        "surface-tint": "#235abf",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-surface-variant": "#5d5f68",
+                        "primary-fixed-dim": "#5988f0",
+                        "surface-container": "#ededf6",
+                        surface: "#faf8fe",
+                        error: "#a83836",
+                        "error-container": "#fa746f",
+                        "surface-variant": "#e1e2ed",
+                        "on-primary": "#f9f8ff",
+                        "on-tertiary-fixed-variant": "#604c74",
+                        "inverse-on-surface": "#9d9ca2",
+                        "secondary-fixed-dim": "#ced4eb",
+                        "primary-fixed": "#6795fe",
+                        "secondary-container": "#dce2f9",
+                        "on-tertiary-container": "#56436a",
+                        "surface-container-high": "#e7e7f1",
+                        secondary: "#585f72",
+                        "on-secondary-container": "#4b5164",
+                        "on-error-container": "#6e0a12",
+                        "on-secondary": "#f9f8ff",
+                        "surface-container-low": "#f4f3fa",
+                        "secondary-fixed": "#dce2f9",
+                        "on-primary-fixed": "#000000",
+                        background: "#faf8fe",
+                        "surface-container-lowest": "#ffffff",
+                        tertiary: "#6b5780",
+                        "on-tertiary-fixed": "#423056",
+                        "tertiary-fixed-dim": "#d8c0ef",
+                        "tertiary-fixed": "#e7cdfe",
+                        primary: "#235abf",
+                        "tertiary-container": "#e7cdfe",
+                        outline: "#787a84",
+                        "on-primary-fixed-variant": "#002158",
+                        "on-surface": "#30323a",
+                        "surface-dim": "#d8d9e4",
+                        "on-background": "#30323a",
+                        "on-secondary-fixed-variant": "#555b6e",
+                        "inverse-primary": "#6795fe",
+                        "primary-container": "#6795fe",
+                        "inverse-surface": "#0d0e12",
+                        "on-error": "#fff7f6",
+                        "on-primary-container": "#001843",
+                        "on-secondary-fixed": "#393f51",
+                        "error-dim": "#67040d",
+                        "secondary-dim": "#4c5366",
+                        "primary-dim": "#0b4db3",
+                        "tertiary-dim": "#5e4b73"
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans"],
+                        body: ["Public Sans"],
+                        label: ["Public Sans"],
+                        display: "Public Sans"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
 </head>
 
-<body>
-
-    <div class="app-container">
-        <header>
-            <div class="logo-container">
-                <h1>HierIci</h1>
-                <button class="about-btn" onclick="openAbout()">À propos</button>
-                <a href="/storymaps/" class="about-btn">Storymaps</a>
-                <a href="/admin/" class="admin-link">Admin</a>
-            </div>
-
-        </header>
-
-        <div id="about-modal" onclick="closeAbout(event)">
-            <div class="about-modal-box" onclick="event.stopPropagation()">
-                <button class="about-close" onclick="closeAbout()">&times;</button>
-                <h2>HierIci</h2>
-                <div class="about-subtitle">Exploration des photographies historiques géolocalisées</div>
-                <p>
-                    <strong>HierIci</strong> est une application de cartographie interactive permettant
-                    de visualiser et explorer des photographies anciennes géolocalisées sur le territoire d'Albi et de
-                    sa région.
-                </p>
-                <p>
-                    Chaque marqueur sur la carte représente une photographie prise depuis ce point.
-                    La direction de la flèche indique <span class="about-accent">l'orientation de la prise de
-                        vue</span>.
-                </p>
-                <hr class="about-divider">
-                <p style="margin:0; font-size:0.85rem; color:#6b7280;">
-                    Cliquez sur un marqueur pour découvrir la photographie et ses informations.
-                    Cliquez sur la photo pour l'agrandir.
-                </p>
-            </div>
+<body class="text-on-surface overflow-hidden h-screen flex flex-col font-body bg-[#faf9f5]">
+    <!-- TopNavBar -->
+    <header class="fixed top-0 left-0 right-0 z-[60] px-6 py-3 flex justify-between items-center bg-[#faf9f5] dark:bg-slate-950 shadow-sm dark:shadow-none">
+        <div class="flex items-center gap-8">
+            <span class="text-2xl font-serif font-bold text-[#0d2e4e] dark:text-blue-200">HierIci</span>
+            <nav class="hidden md:flex items-center gap-6 ml-4">
+                <a class="text-sm font-bold text-primary border-b-2 border-primary pb-1" href="#">Carte</a>
+                <a class="text-sm font-bold text-slate-500 hover:text-primary transition-colors" href="/storymaps/">Storymaps</a>
+            </nav>
         </div>
+        <div class="flex items-center gap-4">
+            <button class="text-sm font-bold text-slate-500 hover:text-primary transition-colors" onclick="openAbout()">À propos</button>
+            <a href="/admin/" class="text-sm font-bold bg-primary text-white px-3 py-1 rounded-lg hover:bg-primary-dim transition-colors">Admin</a>
+        </div>
+    </header>
 
-        <div id="map"></div>
+    <!-- Modale À propos -->
+    <div id="about-modal" class="fixed z-[3000] inset-0 bg-black/50 backdrop-blur-md items-center justify-center opacity-0 transition-opacity duration-300 hidden" onclick="closeAbout(event)">
+        <div class="glass-panel border-outline-variant/20 rounded-2xl shadow-2xl p-8 max-w-lg w-[calc(100%-40px)] relative transform transition-transform" onclick="event.stopPropagation()">
+            <button class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/5 flex items-center justify-center hover:bg-black/10 transition-colors" onclick="closeAbout()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <h2 class="text-2xl font-headline font-bold text-primary mb-2">HierIci</h2>
+            <div class="text-sm text-slate-500 mb-6">Exploration des photographies historiques géolocalisées</div>
+            <p class="text-slate-700 leading-relaxed mb-4">
+                <strong>HierIci</strong> est une application de cartographie interactive permettant de visualiser et explorer des photographies anciennes géolocalisées sur le territoire d'Albi et de sa région.
+            </p>
+            <p class="text-slate-700 leading-relaxed mb-6">
+                Chaque marqueur sur la carte représente une photographie prise depuis ce point. La direction de la flèche indique <span class="bg-amber-500/15 text-amber-700 rounded px-2 py-0.5 font-bold text-sm">l'orientation de la prise de vue</span>.
+            </p>
+            <hr class="border-t border-black/5 my-5">
+            <p class="text-sm text-slate-500 m-0">
+                Cliquez sur un marqueur pour découvrir la photographie et ses informations. Cliquez sur la photo pour l'agrandir.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Map View Area -->
+    <main class="relative flex-1 mt-[68px] flex overflow-hidden">
+        <!-- Map Canvas -->
+        <div id="map" class="relative flex-1 map-canvas overflow-hidden"></div>
 
         <!-- Layer Switcher -->
-        <div id="layer-switcher">
-            <button class="layer-btn active" data-layer="darkMatter"
-                onclick="switchBaseLayer('darkMatter')">Sombre</button>
-            <button class="layer-btn" data-layer="voyager" onclick="switchBaseLayer('voyager')">Clair</button>
-            <button class="layer-btn" data-layer="ortho1950" onclick="switchBaseLayer('ortho1950')">Ortho
-                1950–1965</button>
-            <button class="layer-btn" data-layer="ortho1965" onclick="switchBaseLayer('ortho1965')">Ortho
-                1965–1980</button>
+        <div id="layer-switcher" class="absolute bottom-8 left-8 z-[70] glass-panel p-2 rounded-xl shadow-lg flex flex-col md:flex-row gap-2">
+            <button class="layer-btn active px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap bg-primary text-white border-transparent" data-layer="darkMatter" onclick="switchBaseLayer('darkMatter')">Sombre</button>
+            <button class="layer-btn px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap bg-primary/5 text-primary hover:bg-primary/10 border-transparent" data-layer="voyager" onclick="switchBaseLayer('voyager')">Clair</button>
+            <button class="layer-btn px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap bg-primary/5 text-primary hover:bg-primary/10 border-transparent" data-layer="ortho1950" onclick="switchBaseLayer('ortho1950')">Ortho 1950-1965</button>
+            <button class="layer-btn px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap bg-primary/5 text-primary hover:bg-primary/10 border-transparent" data-layer="ortho1965" onclick="switchBaseLayer('ortho1965')">Ortho 1965-1980</button>
         </div>
 
-        <aside id="side-panel">
-            <button class="close-panel" onclick="closePanel()">&times;</button>
-            <div id="panel-photo" class="photo-container">
-                <!-- Image here -->
-            </div>
-            <div class="panel-content">
-                <div id="panel-body">
-                    <!-- Content here -->
+        <!-- Right Sidebar Panel: Photo Details -->
+        <aside id="photo-side-panel" style="width: 100%; max-width: 600px; right: 0; top: 0; height: 100%;" class="absolute bg-surface border-l border-outline-variant/10 shadow-2xl flex flex-col z-50 transform translate-x-full transition-transform duration-500 ease-in-out">
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <div class="flex items-start mb-6">
+                    <div class="flex items-center justify-between mb-8 w-full border-b border-outline-variant/10 pb-3">
+                        <div class="flex gap-8">
+                            <button class="text-xs font-bold uppercase tracking-widest text-primary border-b-2 border-primary transition-all pb-1 translate-y-[13px]">
+                                Détails
+                            </button>
+                        </div>
+                        <button class="p-2 -mt-3 hover:bg-surface-container-low rounded-full transition-colors" onclick="closePanel()">
+                            <span class="material-symbols-outlined text-primary">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Archival Photo Container -->
+                <div class="relative mb-8" id="panel-photo-container">
+                    <div class="bg-surface-container-lowest p-2.5 shadow-md transform transition-transform duration-500 rounded-lg max-h-[500px] flex items-center justify-center cursor-pointer hover:scale-[1.01]" onclick="openImageModal()">
+                        <img id="panel-photo" class="w-full h-auto max-h-[480px] object-contain rounded-sm" src="" alt="">
+                    </div>
+                    <div id="panel-archive-id" class="absolute -bottom-4 -right-2 bg-secondary text-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] shadow-lg rounded-sm hidden">
+                        <!-- ID or Date badge -->
+                    </div>
+                </div>
+
+                <!-- Metadata & Story -->
+                <div class="space-y-6">
+                    <header>
+                        <div id="panel-era" class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-wider mb-3 hidden">
+                            <!-- Era/Badges -->
+                        </div>
+                        <h1 id="panel-title" class="text-3xl font-headline font-bold text-primary leading-tight mb-2"></h1>
+                        <div class="flex items-center gap-4 text-sm text-slate-500 font-body">
+                            <span id="panel-date" class="flex items-center gap-1.5 hidden">
+                                <span class="material-symbols-outlined text-base">calendar_today</span> <span class="val"></span>
+                            </span>
+                            <span id="panel-compass" class="flex items-center gap-1.5 hidden">
+                                <span class="material-symbols-outlined text-base" id="panel-compass-icon" style="transition: transform 0.5s;">explore</span> <span class="val"></span>
+                            </span>
+                        </div>
+                    </header>
+                    <div class="h-px bg-outline-variant/20"></div>
+                    <article class="prose prose-slate max-w-none">
+                        <p id="panel-desc" class="font-body text-slate-600 mt-4 leading-relaxed"></p>
+                    </article>
+                    <div class="pt-4 flex flex-col gap-6">
+                        <div class="flex flex-col gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Auteur</h3>
+                            <p id="panel-author" class="text-sm font-bold text-primary px-1">Inconnu</p>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">Source</h3>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low">
+                                <div class="w-10 h-10 rounded-full archival-gradient flex items-center justify-center text-white font-headline">
+                                    <span class="material-symbols-outlined text-xl">account_balance</span>
+                                </div>
+                                <div id="panel-source-container">
+                                    <!-- Source will go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </aside>
-    </div>
+    </main>
 
-    <div id="image-modal" onclick="closeModal(event)">
-        <div class="modal-content-wrapper" onclick="event.stopPropagation()">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <img id="modal-img" src="" alt="">
-            <div id="modal-caption" class="modal-caption"></div>
+    <!-- Modal Image Fullscreen -->
+    <div id="image-modal" class="fixed z-[2000] inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center opacity-0 transition-opacity duration-300" onclick="closeModal(event)">
+        <div class="relative max-w-[90%] max-h-[90%] flex flex-col items-center" onclick="event.stopPropagation()">
+            <span class="absolute -top-12 right-0 text-white text-4xl font-bold cursor-pointer hover:scale-110 transition-transform" onclick="closeModal()">&times;</span>
+            <img id="modal-img" src="" alt="" class="max-w-full max-h-[80vh] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 object-contain">
+            <div id="modal-caption" class="text-white mt-5 text-xl font-semibold text-center drop-shadow-md"></div>
         </div>
     </div>
+
+    <!-- Mobile Bottom NavBar (Hidden on desktop) -->
+    <nav class="fixed bottom-0 left-0 w-full flex md:hidden justify-around items-center px-4 pb-4 pt-2 bg-[#faf9f5]/80 dark:bg-slate-950/80 backdrop-blur-md z-50 rounded-t-2xl outline outline-1 outline-[#c3c6cf]/15 shadow-[0_-8px_32px_rgba(27,28,26,0.06)]">
+        <div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1 hover:text-[#0d2e4e]" onclick="openAbout()">
+            <span class="material-symbols-outlined">info</span>
+            <span class="text-[10px] font-label uppercase tracking-wider">Infos</span>
+        </div>
+    </nav>
 
     <!-- OpenLayers JS -->
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.15.1/build/ol.js"></script>
@@ -99,8 +237,6 @@
     </script>
 
     <!-- Logique carte et UI -->
-    <script src="{% static 'js/map.js' %}"></script>
-
+    <script src="{% static 'js/map.js' %}?v=2"></script>
 </body>
-
 </html>

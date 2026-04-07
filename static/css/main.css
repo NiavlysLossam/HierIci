@@ -1,341 +1,48 @@
+/* main.css — HierIci Tailwind Overrides */
+
 :root {
     --primary: #1a2a3a;
-    --accent: #d4af37;
-    --glass: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    --panel-width: 400px;
 }
 
-body,
-html {
+body, html {
     margin: 0;
     padding: 0;
-    height: 100%;
-    font-family: 'Inter', sans-serif;
-    background: #f8fafc;
-    overflow: hidden;
+    font-family: 'Public Sans', 'Inter', sans-serif;
 }
 
-/* Layout Container */
-.app-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    position: relative;
+/* Material Symbols config */
+.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    vertical-align: middle;
 }
 
-/* Header / Logo */
-header {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo-container {
-    background: var(--glass);
+/* Custom UI Elements from maquette.html */
+.glass-panel {
+    background: rgba(250, 249, 245, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    border: 1px solid rgba(195, 198, 207, 0.15);
 }
 
-h1 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary);
-    letter-spacing: -0.5px;
+.archival-gradient {
+    background: linear-gradient(135deg, #001932 0%, #0d2e4e 100%);
 }
 
-.admin-link {
-    text-decoration: none;
-    color: white;
-    background: var(--primary);
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
-.admin-link:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-.about-btn {
-    background: none;
-    border: 1.5px solid rgba(26, 42, 58, 0.25);
-    color: var(--primary);
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.2s ease;
-}
-
-.about-btn:hover {
-    background: rgba(26, 42, 58, 0.07);
-    transform: translateY(-1px);
-}
-
-/* Modale À propos */
-#about-modal {
-    display: none;
-    position: fixed;
-    z-index: 3000;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-#about-modal.active {
-    display: flex;
-    opacity: 1;
-}
-
-.about-modal-box {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 40px;
-    max-width: 480px;
-    width: calc(100% - 40px);
-    position: relative;
-    animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.about-modal-box h2 {
-    margin: 0 0 8px 0;
-    font-size: 1.6rem;
-    color: var(--primary);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.about-modal-box .about-subtitle {
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin-bottom: 24px;
-}
-
-.about-modal-box p {
-    color: #374151;
-    line-height: 1.7;
-    margin: 0 0 16px 0;
-    font-size: 0.95rem;
-}
-
-.about-modal-box .about-accent {
-    display: inline-block;
-    background: rgba(212, 175, 55, 0.15);
-    color: #92740e;
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.about-divider {
-    border: none;
-    border-top: 1px solid rgba(0, 0, 0, 0.07);
-    margin: 20px 0;
-}
-
-.about-close {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(0, 0, 0, 0.05);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-
-.about-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-/* Map Container */
-#map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #e5e7eb;
-}
-
-/* Side Panel */
-#side-panel {
-    position: absolute;
-    top: 20px;
-    right: -450px;
-    /* Initially hidden */
-    bottom: 20px;
-    width: var(--panel-width);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow);
-    z-index: 1000;
-    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-#side-panel.open {
-    right: 20px;
-}
-
-.side-panel-header {
-    padding: 24px;
-    position: relative;
-}
-
-.close-panel {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.05);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    transition: background 0.2s;
-}
-
-.close-panel:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.photo-container {
-    width: 100%;
-    background: #000;
-    min-height: 250px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.photo-container img {
-    max-width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-}
-
-.panel-content {
-    padding: 24px;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.panel-content h2 {
-    margin: 0 0 12px 0;
-    color: var(--primary);
-    font-size: 1.5rem;
-    line-height: 1.2;
-}
-
-.panel-content .metadata {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.badge {
-    background: rgba(26, 42, 58, 0.08);
-    color: var(--primary);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.description {
-    color: #4b5563;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    font-size: 0.95rem;
-}
-
-.footer-info {
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding-top: 20px;
-    font-size: 0.8rem;
-    color: #6b7280;
-}
-
-.footer-info a {
-    color: var(--primary);
-    text-decoration: underline;
-}
-
-/* Custom Compass Logic (Wait for JS expansion if needed) */
-.compass-indicator {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.compass-icon {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Attribution override for cleaner map */
+/* OpenLayers overrides for cleaner map */
 .ol-attribution {
     bottom: 30px !important;
     right: 20px !important;
@@ -344,10 +51,10 @@ h1 {
 }
 
 .ol-control button {
-    background-color: var(--glass) !important;
+    background-color: rgba(250, 249, 245, 0.8) !important;
     color: var(--primary) !important;
     backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border) !important;
+    border: 1px solid rgba(195, 198, 207, 0.15) !important;
     border-radius: 8px !important;
     margin: 2px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
@@ -359,138 +66,11 @@ h1 {
 
 .ol-zoom {
     top: auto !important;
-    bottom: 20px !important;
+    bottom: 90px !important; /* give space to layer switcher */
     left: 20px !important;
 }
 
-/* Layer Switcher */
-#layer-switcher {
-    position: absolute;
-    bottom: 20px;
-    left: 80px;
-    z-index: 1000;
-    background: var(--glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    padding: 8px;
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-}
-
-.layer-btn {
-    border: 1.5px solid transparent;
-    background: rgba(26, 42, 58, 0.06);
-    color: var(--primary);
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.layer-btn:hover {
-    background: rgba(26, 42, 58, 0.12);
-}
-
-.layer-btn.active {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
-}
-
-/* Responsive Mobile */
-@media (max-width: 600px) {
-    :root {
-        --panel-width: calc(100% - 40px);
-    }
-
-    header {
-        width: calc(100% - 40px);
-    }
-
-    .logo-container {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-
-/* Modal Styles */
-#image-modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-#image-modal.active {
-    display: flex;
-    opacity: 1;
-}
-
-.modal-content-wrapper {
-    position: relative;
-    max-width: 90%;
-    max-height: 90%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#modal-img {
-    max-width: 100%;
-    max-height: 80vh;
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    object-fit: contain;
-}
-
-.modal-caption {
-    color: white;
-    margin-top: 20px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    text-align: center;
-}
-
-.close-modal {
-    position: absolute;
-    top: -50px;
-    right: 0;
-    color: white;
-    font-size: 35px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.close-modal:hover {
-    transform: scale(1.1);
-}
-
-.photo-container img {
-    cursor: zoom-in;
-    transition: transform 0.3s ease;
-}
-
-.photo-container img:hover {
-    transform: scale(1.02);
+/* Leaflet/OL Map cursor helpers */
+.map-canvas {
+    background-color: #f4f4f0;
 }

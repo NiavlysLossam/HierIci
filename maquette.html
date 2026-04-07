@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>HierIci - Digital Archivist</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline-variant": "#b0b1bc",
+                        "surface-bright": "#faf8fe",
+                        "on-tertiary": "#fff6ff",
+                        "surface-tint": "#235abf",
+                        "surface-container-highest": "#e1e2ed",
+                        "on-surface-variant": "#5d5f68",
+                        "primary-fixed-dim": "#5988f0",
+                        "surface-container": "#ededf6",
+                        surface: "#faf8fe",
+                        error: "#a83836",
+                        "error-container": "#fa746f",
+                        "surface-variant": "#e1e2ed",
+                        "on-primary": "#f9f8ff",
+                        "on-tertiary-fixed-variant": "#604c74",
+                        "inverse-on-surface": "#9d9ca2",
+                        "secondary-fixed-dim": "#ced4eb",
+                        "primary-fixed": "#6795fe",
+                        "secondary-container": "#dce2f9",
+                        "on-tertiary-container": "#56436a",
+                        "surface-container-high": "#e7e7f1",
+                        secondary: "#585f72",
+                        "on-secondary-container": "#4b5164",
+                        "on-error-container": "#6e0a12",
+                        "on-secondary": "#f9f8ff",
+                        "surface-container-low": "#f4f3fa",
+                        "secondary-fixed": "#dce2f9",
+                        "on-primary-fixed": "#000000",
+                        background: "#faf8fe",
+                        "surface-container-lowest": "#ffffff",
+                        tertiary: "#6b5780",
+                        "on-tertiary-fixed": "#423056",
+                        "tertiary-fixed-dim": "#d8c0ef",
+                        "tertiary-fixed": "#e7cdfe",
+                        primary: "#235abf",
+                        "tertiary-container": "#e7cdfe",
+                        outline: "#787a84",
+                        "on-primary-fixed-variant": "#002158",
+                        "on-surface": "#30323a",
+                        "surface-dim": "#d8d9e4",
+                        "on-background": "#30323a",
+                        "on-secondary-fixed-variant": "#555b6e",
+                        "inverse-primary": "#6795fe",
+                        "primary-container": "#6795fe",
+                        "inverse-surface": "#0d0e12",
+                        "on-error": "#fff7f6",
+                        "on-primary-container": "#001843",
+                        "on-secondary-fixed": "#393f51",
+                        "error-dim": "#67040d",
+                        "secondary-dim": "#4c5366",
+                        "primary-dim": "#0b4db3",
+                        "tertiary-dim": "#5e4b73"
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans"],
+                        body: ["Public Sans"],
+                        label: ["Public Sans"],
+                        display: "Public Sans"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+            vertical-align: middle
+        }
+
+        body {
+            font-family: "Public Sans", sans-serif;
+            background-color: #faf9f5
+        }
+
+        .glass-panel {
+            background: rgba(250, 249, 245, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(195, 198, 207, 0.15)
+        }
+
+        .archival-gradient {
+            background: linear-gradient(135deg, #001932 0%, #0d2e4e 100%)
+        }
+
+        .map-canvas {
+            background-color: #f4f4f0;
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBZxEb34Zpeqe6FBUqOUThvUm3bNqSIsEGQe4JEdGU5zPo-ViTAIAxLNNaE3tBSeX488SfPxiqeNtjj9x7YCaqYdNW5wrsOGSt5hrQ0IE2DkvQyvCeICQRgERrZzfVz2jS3Jr90H8xjKVrV8UWglJTPwjGJ1U1haoi21e_xDv6YH9K2iOAYRNMrIJhzfnMsxSQ64TDMELHDiIb2vfw31YdJmxCfXqT-mhua0O2fifsKZC6-f0Zx56AeR_fNoxn45pLGwm5qyhNsYqA)
+        }
+    </style>
+</head>
+
+<body class="text-on-surface overflow-hidden h-screen flex flex-col">
+    <!-- TopNavBar -->
+    <header
+        class="fixed top-0 left-0 right-0 z-[60] px-6 py-3 flex justify-between items-center bg-[#faf9f5] dark:bg-slate-950 shadow-sm dark:shadow-none">
+        <div class="flex items-center gap-8">
+            <span class="text-2xl font-serif font-bold text-[#0d2e4e] dark:text-blue-200" style="">HierIci</span>
+            <nav class="hidden md:flex items-center gap-6 ml-4">
+                <a class="text-sm font-bold text-primary border-b-2 border-primary pb-1" href="#" style="">Carte</a>
+                <a class="text-sm font-bold text-slate-500 hover:text-primary transition-colors" href="#"
+                    style="">StoryMap</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="bg-surface-container-low px-4 py-1.5 rounded-full flex items-center gap-2 group">
+                <span class="material-symbols-outlined text-outline text-lg" style="">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-sm font-body w-48"
+                    placeholder="Search history..." type="text">
+            </div>
+            <button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#f4f4f0] transition-colors"
+                style="">
+                <span class="material-symbols-outlined text-[#0d2e4e]" style="">account_circle</span>
+            </button>
+        </div>
+    </header>
+    <!-- Main Map View Area -->
+    <main class="relative flex-1 mt-14 flex overflow-hidden">
+        <!-- Large Immersive Map Canvas -->
+        <div class="relative flex-1 map-canvas overflow-hidden">
+            <img class="w-full h-full object-cover mix-blend-multiply opacity-80"
+                data-alt="high detail vintage styled digital map of Paris with sepia tones and architectural line drawings of landmarks"
+                data-location="Paris, France"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZxEb34Zpeqe6FBUqOUThvUm3bNqSIsEGQe4JEdGU5zPo-ViTAIAxLNNaE3tBSeX488SfPxiqeNtjj9x7YCaqYdNW5wrsOGSt5hrQ0IE2DkvQyvCeICQRgERrZzfVz2jS3Jr90H8xjKVrV8UWglJTPwjGJ1U1haoi21e_xDv6YH9K2iOAYRNMrIJhzfnMsxSQ64TDMELHDiIb2vfw31YdJmxCfXqT-mhua0O2fifsKZC6-f0Zx56AeR_fNoxn45pLGwm5qyhNsYqA"
+                style="">
+            <!-- Map Markers removed as per request -->
+            <!-- Floating Map Tools -->
+            <div class="absolute left-6 top-6 flex flex-col gap-2">
+                <div class="glass-panel p-1 rounded-xl flex flex-col gap-1 shadow-lg">
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high text-primary transition-colors"
+                        style="">
+                        <span class="material-symbols-outlined" style="">add</span>
+                    </button>
+                    <div class="h-px bg-outline-variant/20 mx-2"></div>
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high text-primary transition-colors"
+                        style="">
+                        <span class="material-symbols-outlined" style="">remove</span>
+                    </button>
+                </div>
+                <div class="glass-panel p-1 rounded-xl shadow-lg mt-2">
+                    <button class="w-10 h-10 flex items-center justify-center rounded-lg archival-gradient text-white"
+                        style="">
+                        <span class="material-symbols-outlined" style="">layers</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Bottom Interactive Timeline / Date Filter Bar - Repositioned to map area -->
+            <div class="absolute bottom-0 left-0 w-full z-[70] px-8 pb-8 pointer-events-none">
+                <div
+                    class="max-w-xl mx-auto glass-panel p-4 rounded-full shadow-lg pointer-events-auto border-outline-variant/10">
+                    <div class="flex items-center gap-6 px-4">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-tighter opacity-60"
+                                style="">Period</span>
+                            <span class="font-headline font-bold text-secondary text-sm" style="">1890 — 1910</span>
+                        </div>
+                        <div class="flex-1 relative h-8 flex items-center group">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full h-0.5 bg-surface-container-high rounded-full overflow-hidden">
+                                    <div class="h-full archival-gradient w-1/4 translate-x-[150%]"></div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 flex justify-between px-0.5">
+                                <span class="text-[9px] font-medium text-slate-400 mt-5" style="">1800</span>
+                                <span class="text-[9px] font-medium text-slate-400 mt-5" style="">1850</span>
+                                <span class="text-[9px] font-bold text-primary mt-5" style="">1900</span>
+                                <span class="text-[9px] font-medium text-slate-400 mt-5" style="">1950</span>
+                                <span class="text-[9px] font-medium text-slate-400 mt-5" style="">2000</span>
+                            </div>
+                            <!-- Simple Circular Thumbs -->
+                            <div
+                                class="absolute left-[38%] w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10">
+                            </div>
+                            <div
+                                class="absolute left-[58%] w-4 h-4 bg-white border-2 border-primary rounded-full shadow-md cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10">
+                            </div>
+                        </div>
+                        <div class="flex gap-3 ml-2 border-l border-outline-variant/20 pl-4">
+                            <button class="text-[10px] font-bold text-slate-400 hover:text-primary transition-colors"
+                                style="">1800s</button>
+                            <button class="text-[10px] font-bold text-primary" style="">1900s</button>
+                            <button class="text-[10px] font-bold text-slate-400 hover:text-primary transition-colors"
+                                style="">2000s</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Sidebar Panel: Photo Details - Widened to 45% -->
+        <aside class="w-full md:w-[45%] bg-surface border-l border-outline-variant/10 shadow-2xl flex flex-col z-50">
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <div class="flex items-start mb-6">
+                    <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10">
+                        <div class="flex gap-8">
+                            <button
+                                class="pb-3 text-xs font-bold uppercase tracking-widest text-primary border-b-2 border-primary transition-all"
+                                style="">
+                                Hier</button>
+                            <button
+                                class="pb-3 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-all"
+                                style="">
+                                Auhourd'hui</button>
+                        </div>
+                        <button class="p-2 -mt-3 hover:bg-surface-container-low rounded-full transition-colors"
+                            style="">
+                            <span class="material-symbols-outlined text-primary" style="">close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Archival Photo Container -->
+                <div class="relative mb-8">
+                    <div
+                        class="bg-surface-container-lowest p-2.5 shadow-md transform -rotate-1 hover:rotate-0 transition-transform duration-500 rounded-lg">
+                        <img class="w-full aspect-[4/3] object-cover grayscale brightness-90 contrast-110 rounded-sm"
+                            data-alt="sepia toned historical black and white street photograph of 19th century Paris with horse carriages and cobblestones"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQq6GJ0Xbc-pqINvZF6Ye5EysBBA86uUdWai-SBiroBQyk_SA47_-NppGk6b0B38VVfSOhvqRqTcsFtNaIoNt4yko_9gqoBvgu7uai8pGj2IhQlez4YLsxnR8UlAkpkRt_PJXvw8CyRQaHByberhE9pF3RqWsFWAxb45CUA8NRspalT6stzfUhHC8eY0zv2w_ngwvTomHGJRLaQfzVAwTJPQYXBh92Kjw_ccbwdX2vVl9q464CyEgvVg-muIEF8g-QNZdjG-DQvxQ"
+                            style="">
+                    </div>
+                    <div class="absolute -bottom-4 -right-2 bg-secondary text-white px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] shadow-lg rounded-sm"
+                        style="">
+                        Archive #8821-B
+                    </div>
+                </div>
+                <!-- Metadata & Story -->
+                <div class="space-y-6">
+                    <header>
+                        <div class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-wider mb-3"
+                            style="">Era: La Belle Époque</div>
+                        <h1 class="text-3xl font-headline font-bold text-primary leading-tight mb-2" style="">Quai du
+                            Louvre, Automne</h1>
+                        <div class="flex items-center gap-4 text-sm text-slate-500 font-body"><span
+                                class="flex items-center gap-1.5" style=""><span
+                                    class="material-symbols-outlined text-base" style="">calendar_today</span> 14
+                                Octobre 1898</span><span class="flex items-center gap-1.5" style=""><span
+                                    class="material-symbols-outlined text-base" style="">location_on</span> 1er
+                                Arrondissement</span></div>
+                    </header>
+                    <div class="h-px bg-outline-variant/20"></div>
+                    <article class="prose prose-slate max-w-none">
+                        <p class="font-headline italic text-lg text-primary/80 leading-relaxed" style="">
+                            "The city breathed with a different rhythm then. You could hear the clicking of horse hooves
+                            against the wet cobblestones long before you saw the carriage emerge from the morning fog."
+                        </p>
+                        <p class="font-body text-slate-600 mt-4 leading-relaxed" style="">
+                            This rare plate captures the Seine at its most industrious. Notice the small steam barges
+                            unloading stone for the construction of the Grand Palais. At this moment, Paris was
+                            undergoing a radical transformation under the guidance of the Third Republic, blending
+                            medieval charm with modern iron industrialism.
+                        </p>
+                    </article>
+                    <div class="pt-4 flex flex-col gap-6">
+                        <div class="flex flex-col gap-2">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400" style="">Auteur</h3>
+                            <p class="text-sm font-bold text-primary px-1" style="">Photographe inconnu</p>
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400" style="">Source</h3>
+                            <div class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low">
+                                <div
+                                    class="w-10 h-10 rounded-full archival-gradient flex items-center justify-center text-white font-headline">
+                                    <span class="material-symbols-outlined text-xl" style="">account_balance</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-primary" style="">Archives de Paris</p>
+                                    <p class="text-[11px] text-slate-500" style="">Domaine Public</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+    <!-- Mobile Bottom NavBar (Hidden on desktop) -->
+    <nav
+        class="fixed bottom-0 left-0 w-full flex md:hidden justify-around items-center px-4 pb-4 pt-2 bg-[#faf9f5]/80 dark:bg-slate-950/80 backdrop-blur-md z-50 rounded-t-2xl outline outline-1 outline-[#c3c6cf]/15 shadow-[0_-8px_32px_rgba(27,28,26,0.06)]">
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1 hover:text-[#0d2e4e]">
+            <span class="material-symbols-outlined" style="">event_repeat</span>
+            <span class="text-[10px] font-label uppercase tracking-wider" style="">Timeline</span>
+        </div>
+        <div
+            class="flex flex-col items-center justify-center bg-[#0d2e4e] text-white rounded-xl px-4 py-1 scale-95 duration-150">
+            <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">layers</span>
+            <span class="text-[10px] font-label uppercase tracking-wider" style="">Layers</span>
+        </div>
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1 hover:text-[#0d2e4e]">
+            <span class="material-symbols-outlined" style="">tune</span>
+            <span class="text-[10px] font-label uppercase tracking-wider" style="">Filter</span>
+        </div>
+        <div
+            class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-4 py-1 hover:text-[#0d2e4e]">
+            <span class="material-symbols-outlined" style="">share</span>
+            <span class="text-[10px] font-label uppercase tracking-wider" style="">Share</span>
+        </div>
+    </nav>
+</body>
+
+</html>

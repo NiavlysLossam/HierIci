@@ -164,9 +164,13 @@
 
     function updateIndicator(chapter) {
         indicator.textContent = chapter.title;
-        indicator.classList.add('visible');
+        indicator.classList.remove('opacity-0');
+        indicator.classList.add('opacity-100');
         clearTimeout(indicatorTimer);
-        indicatorTimer = setTimeout(() => indicator.classList.remove('visible'), 3000);
+        indicatorTimer = setTimeout(() => {
+            indicator.classList.remove('opacity-100');
+            indicator.classList.add('opacity-0');
+        }, 3000);
     }
 
     // -----------------------------------------------------------------------
@@ -178,28 +182,40 @@
         chapters.forEach((ch, idx) => {
             // Wrapper chapitre
             const div = document.createElement('div');
-            div.className = 'chapter';
+            div.className = 'chapter relative min-h-[90vh] flex items-center justify-center p-6 md:p-12 transition-opacity duration-500';
             div.dataset.idx = idx;
+
+            // Ligne verticale connectrice
+            const line = document.createElement('div');
+            line.className = 'absolute left-8 md:left-14 top-0 bottom-0 w-px bg-outline-variant/30 -z-10 transition-colors duration-500 line-connector';
+            div.appendChild(line);
 
             // Card
             const card = document.createElement('div');
-            card.className = 'chapter-card';
+            // Adding a 'group' and specific active classes managed by JS observer later
+            card.className = 'chapter-card max-w-xl w-full glass-panel border border-outline-variant/15 rounded-2xl p-8 md:p-10 shadow-lg relative transition-all duration-500 transform translate-y-4 opacity-70 hover:opacity-100 hover:shadow-xl bg-surface-container-lowest';
+
+            // Point sur la ligne
+            const dot = document.createElement('div');
+            dot.className = 'absolute -left-[1.35rem] md:-left-[3.35rem] top-12 w-3 h-3 rounded-full bg-outline-variant/50 border-2 border-surface transition-all duration-500 dot-indicator shadow-sm';
+            card.appendChild(dot);
 
             // Numéro
             const num = document.createElement('div');
-            num.className = 'chapter-number';
+            num.className = 'text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-4 transition-colors duration-300 chapter-num';
             num.textContent = `Chapitre ${idx + 1}`;
             card.appendChild(num);
 
             // Titre
             const h2 = document.createElement('h2');
+            h2.className = 'text-2xl md:text-3xl font-headline font-bold text-[#0d2e4e] leading-tight mb-5';
             h2.textContent = ch.title;
             card.appendChild(h2);
 
             // Texte narratif
             if (ch.narrative) {
                 const p = document.createElement('p');
-                p.className = 'chapter-narrative';
+                p.className = 'text-base font-body text-slate-600 leading-relaxed';
                 p.textContent = ch.narrative;
                 card.appendChild(p);
             }
@@ -207,17 +223,18 @@
             // Photo
             if (ch.photo_image) {
                 const photoWrap = document.createElement('div');
-                photoWrap.className = 'chapter-photo-wrap';
+                photoWrap.className = 'mt-8 rounded-xl overflow-hidden shadow-md bg-stone-900 border border-outline-variant/10';
 
                 const img = document.createElement('img');
                 img.src = ch.photo_image;
                 img.alt = ch.photo_title || ch.title;
+                img.className = 'w-full max-h-[350px] object-contain block mx-auto py-2';
                 img.loading = 'lazy';
                 photoWrap.appendChild(img);
 
                 if (ch.photo_title) {
                     const caption = document.createElement('div');
-                    caption.className = 'chapter-photo-caption';
+                    caption.className = 'bg-stone-800 text-stone-300 text-xs px-4 py-2 italic flex items-center justify-center text-center';
                     caption.textContent = ch.photo_title;
                     photoWrap.appendChild(caption);
                 }
@@ -251,7 +268,31 @@
 
                 // Mise à jour visuelle : chapitre actif
                 document.querySelectorAll('.chapter[data-idx]').forEach(el => {
-                    el.classList.toggle('active', parseInt(el.dataset.idx, 10) === idx);
+                    const isActive = parseInt(el.dataset.idx, 10) === idx;
+                    const card = el.querySelector('.chapter-card');
+                    const dot = el.querySelector('.dot-indicator');
+                    const num = el.querySelector('.chapter-num');
+                    const line = el.querySelector('.line-connector');
+
+                    if (isActive) {
+                        card.classList.remove('opacity-70', 'translate-y-4', 'border-outline-variant/15');
+                        card.classList.add('opacity-100', 'translate-y-0', 'border-primary', 'shadow-primary/10');
+                        dot.classList.remove('bg-outline-variant/50');
+                        dot.classList.add('bg-primary', 'scale-150', 'shadow-md', 'shadow-primary/40');
+                        num.classList.remove('text-slate-400');
+                        num.classList.add('text-primary');
+                        line.classList.remove('bg-outline-variant/30');
+                        line.classList.add('bg-primary/50');
+                    } else {
+                        card.classList.add('opacity-70', 'translate-y-4', 'border-outline-variant/15');
+                        card.classList.remove('opacity-100', 'translate-y-0', 'border-primary', 'shadow-primary/10');
+                        dot.classList.add('bg-outline-variant/50');
+                        dot.classList.remove('bg-primary', 'scale-150', 'shadow-md', 'shadow-primary/40');
+                        num.classList.add('text-slate-400');
+                        num.classList.remove('text-primary');
+                        line.classList.add('bg-outline-variant/30');
+                        line.classList.remove('bg-primary/50');
+                    }
                 });
 
                 // Déplacer la carte
